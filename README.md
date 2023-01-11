@@ -1,5 +1,5 @@
 # Stash Custom Javascripts - Unexpectably Powerful !
-<img src="https://user-images.githubusercontent.com/22040708/211264163-5f25f566-8217-4334-9df6-ca742a5e92c5.png" width=500 />
+<p>
 ### Reason to create a repo just for this:
 StashApp is an excellent video management system for all your desires. It has many great features, but playing videos is a little short.<p>
 I made an AutoIt program just to enhance its video playback capability, yet that's not cross-platform and the program has problems here and there.<p>
@@ -14,6 +14,7 @@ Please don't paste 2 scripts into it, or mixing different scripts together. It u
 -----
 
 ### pwPlayer.js - Scene Card Quick Player
+ <img src="https://user-images.githubusercontent.com/22040708/211264163-5f25f566-8217-4334-9df6-ca742a5e92c5.png" width=500 /> <br>
 This Javascript will create a "Play" button in each scene card. You can click on it and the video for that scene will be played right away. Click on the video again, then you are back to the scene list.
 #### Features
 * You Use different mode to watch the video
