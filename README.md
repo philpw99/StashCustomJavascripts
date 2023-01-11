@@ -13,7 +13,7 @@ Please don't paste 2 scripts into it, or mixing different scripts together. It u
 
 -----
 
-### SceneCardPlayer.js
+### pwPlayer.js - Scene Card Quick Player
 This Javascript will create a "Play" button in each scene card. You can click on it and the video for that scene will be played right away. Click on the video again, then you are back to the scene list.
 #### Features
 * You Use different mode to watch the video
