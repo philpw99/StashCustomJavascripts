@@ -1,6 +1,8 @@
 # Stash Custom Javascripts - Unexpectably Powerful !
 <p>
+ 
 ### Reason to create a repo just for this:
+ 
 StashApp is an excellent video management system for all your desires. It has many great features, but playing videos is a little short.<p>
 I made an AutoIt program just to enhance its video playback capability, yet that's not cross-platform and the program has problems here and there.<p>
 Well, in Stash version v0.18 there is a new feature called "Custom Javascript". I saw someone submitted a script to enable IINA player on MacOS. I was curious and started to modify that script. Little did I knew that "Custom Javascript" in StashApp can be so powerful ! I can actually utilize the full pontential of the browsers, Stash and platforms !<p>
