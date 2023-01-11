@@ -23,7 +23,7 @@ This Javascript will create a "Play" button in each scene card. You can click on
 * One click to end the play back, and you will see the scene selection again. Very convenient.
 * Worked and tested in all 3 major browsers: Chrome, Firefox and Ms Edge.
 * Now it can show detailed information for the scene file:
-<img src="https://user-images.githubusercontent.com/22040708/211918593-b30a6f0f-bf06-44b3-96dc-d5bf6599bce2.png" width=300 />
+* <img src="https://user-images.githubusercontent.com/22040708/211918593-b30a6f0f-bf06-44b3-96dc-d5bf6599bce2.png" width=300 />
 
 #### Plans
   - oculusvr mode: If you use Oculus Browser, the script can do automatic VR for you.
