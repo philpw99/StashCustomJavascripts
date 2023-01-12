@@ -3,7 +3,6 @@
    Allow you to easily play those video files.
    To use it, just copy and paste the code into Stash->Settings->Interface->Custome Javascript.
    Then refresh the browser.
-   This is version 1.3
 
    Player mode should be either "browser", "browserfull" or "player"
    In browser mode, the video is played within a <video> tag. It works for most platforms.
@@ -16,9 +15,6 @@
    This is a great way to view Stash and play scene files in Oculus Quest.
    Most importantly, once a video is played, you can make it full screen, then set the
    immersion mode to be "180" and "3d".
-   # Version 1.3 
-   		Added "browserfull" option. Great for Oculus VR playback.
-		Cleaned up the code.
 */
 
 // settings
@@ -109,6 +105,9 @@ pwPlayer_style.innerHTML = `
 		object-fit: contain;
 		object-position: center;
 		cursor: pointer;
+		position: relative;
+		width: 100%;
+		height: 100%;
 	}
 }
 `;
@@ -116,6 +115,7 @@ pwPlayer_style.innerHTML = `
 // Only need to call once.
 const pwPlayer_OS = pwPlayer_getOS();
 log("OS: " + pwPlayer_OS);
+
 document.head.appendChild(pwPlayer_style);
 
 // api
@@ -168,20 +168,19 @@ const pwPlayer_getSceneInfo = async href => {
 function pwPlayer_getOS() {
 	var uA = window.navigator.userAgent,
 	os = "Others";
-
 	switch(true){
-		case uA.indexOf("Win") !== -1:
+		case uA.includes("Win"):
 			return "Windows";
-		case uA.indexOf("Mac") !== -1:
+		case uA.includes("Mac"):
 			return "MacOS";
-		case uA.indexOf("X11") !== -1:
-			return "Unix";
-		case uA.indexOf("Linux") !== -1:
-			return "Linux";
-		case uA.indexOf("Oculus") !== -1:
+		case uA.includes("Oculus"):
 			return "Oculus";
-		case uA.indexOf("Android") !== -1:
+		case uA.includes("Linux"):
+			return "Linux";
+		case uA.includes("Android"):
 			return "Android";
+		case uA.includes("X11"):
+			return "Unix";
 		default:
 			return 'Others';
 	}
@@ -190,21 +189,26 @@ function pwPlayer_getOS() {
 function pwPlayer_getBrowser(){
 	// not using this much.
 	var userAgent = window.navigator.userAgent;
-
-	if(userAgent.match(/OculusBrowser/i))
-		// special detection for Quest 2.
-		return "oculus";
-	if(userAgent.match(/chrome|chromium|crios/i))
-		return "chrome";
-	if(userAgent.match(/firefox|fxios/i))
-		return "firefox";
-	if(userAgent.match(/safari/i))
-		return "safari";
-	if(userAgent.match(/opr\//i))
-		return "opera";
-	if(userAgent.match(/edg/i))
-		return "edge";
-	return "others";
+	
+	switch (true){
+		case userAgent.includes("OculusBrowser"):
+			// special detection for Quest 2.
+			return "oculus";
+		case userAgent.includes("chrom"):
+		case userAgent.includes("crios"):
+			return "chrome";
+		case userAgent.includes("firefox"):
+		case userAgent.includes("fxios"):
+			return "firefox";
+		case userAgent.includes("safari"):
+			return "safari";
+		case userAgent.includes("opr"):
+			return "opera";
+		case userAgent.includes("edg"):
+			return "edge";
+		default:
+			return "others";
+	}
 }
 
 const pwPlayer_config = { subtree: true, childList: true };
@@ -268,13 +272,14 @@ const pwPlayer_addButton = () => {
 				const filePath = result.data.findScene.files[0].path
 					.replace(pwPlayer_settings[pwPlayer_OS].replacePath[0],
 						pwPlayer_settings[pwPlayer_OS].replacePath[1]);
+
 				if (pwPlayer_mode === "browser"){
 					// normal browser mode
 					playVideoInBrowser(streamLink);
 				}else if(pwPlayer_mode === "browserfull"){
 					// fullscreen browser mode
 					playVideoInBrowser(streamLink, true);
-				}else{
+				}else if(pwPlayer_mode === "player"){
 					switch (pwPlayer_OS){
 						case "Mac OS":
 							// Sample local handling for iina player.
@@ -331,7 +336,7 @@ const pwPlayer_addButton = () => {
 							break;
 						default:
 					} // end of the switch
-				} // end of not browser mode
+				} // end of player mode
 			});
 
 		};	// end of button onclick envent.
@@ -387,7 +392,6 @@ function niceBytes(x){
 
 function playVideoInBrowser(streamLink, fullscreen = false){
 	var pwPlayer_video_div = document.createElement("div");
-	// log("video_div instance of node:" + (video_div instanceof Node));
 
 	pwPlayer_video_div.id = "pwPlayer_videoDiv";
 	var pwPlayer_video = document.createElement("video");
@@ -395,17 +399,16 @@ function playVideoInBrowser(streamLink, fullscreen = false){
 	pwPlayer_video.autoplay = true;
 	pwPlayer_video.controls = true;
 	pwPlayer_video.src = streamLink;
-//	pwPlayer_video.width = window.innerWidth-20;
-//	pwPlayer_video.height = window.innerHeight;
 	pwPlayer_video_div.appendChild(pwPlayer_video);
 	var pwPlayer_divNode = document.body.insertBefore(pwPlayer_video_div, document.body.firstChild);
-	// log("divNode instance of node:" + (divNode instanceof Node));
-	log("win w:" + window.innerWidth);
-	log("win h: "+ window.innerHeight);
-/*	window.addEventListener('resize', () => {
-		pwPlayer_video.width = window.innerWidth-20;
-		pwPlayer_video.height = window.innerHeight;
-	}); */
+	pwPlayer_video_div.width =window.innerWidth;
+	pwPlayer_video_div.height =window.innerHeight;
+
+	log("win inner w:" + window.innerWidth);
+	log("win inner h: "+ window.innerHeight);
+	log("div width:" + pwPlayer_video_div.width);
+	log("div height:" + pwPlayer_video_div.height); 
+
 	// save the scroll postion.
 	var pwPlayer_scrollPos;
 	if (typeof window.pageYOffset != 'undefined') {
@@ -426,6 +429,7 @@ function playVideoInBrowser(streamLink, fullscreen = false){
 		doFullScreen();
 		pwPlayer_video.height = screen.height;
 		pwPlayer_video.width = screen.width;
+
 	}
 
 	// track mouse y position
@@ -447,12 +451,6 @@ function playVideoInBrowser(streamLink, fullscreen = false){
 		pwPwPlayer_videoEnd();
 	}
 
-	pwPlayer_video.onresize = () => {
-//		if(inFullScreen()){
-//			pwPlayer_video.height = screen.height;
-//			pwPlayer_video.width = screen.width;
-//		}
-	}
 	pwPlayer_video.onended = () => {
 		if(inFullScreen()){
 			exitFullscreen();
@@ -494,8 +492,12 @@ function doFullScreen() {
               element.msRequestFullscreen;
 
     if( requestMethod ) {
+		// log("fullscreen method found: " + requestMethod);
       requestMethod.apply( element );
-    };
+    }else{
+		// log("fullscreen method not found");
+	}
+	;
 
 }
 
