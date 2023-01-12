@@ -28,9 +28,9 @@ This Javascript will create a "Play" button in each scene card. You can click on
 * Now it can show detailed information for the scene file:
 * <img src="https://user-images.githubusercontent.com/22040708/211918593-b30a6f0f-bf06-44b3-96dc-d5bf6599bce2.png" width=300 />
 #### Versions
- - v0.4 The browser and browserfull mode is better. Oculus browser has a better way handling browserfull mode.
+ - v0.4 The browser and browserfull mode is better. Oculus browser now can play videos in browserfull mode. Useful for VR videos.
  - v0.3 Add "browserfull" mode and test fullscreen feature in all 3 browsers.
  - v0.2 Seperate the code with different mode: "browsers" and "player".
  - v0.1 Add file details to the on mouse hover event.
 #### Plans
-  - oculusvr mode: If you use Oculus Browser, the script can do automatic VR for you.
+  - oculusvr mode: ~~ If you use Oculus Browser, the script can do automatic VR for you. ~~ Need https for further WebVR control.
