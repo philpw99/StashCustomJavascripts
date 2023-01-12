@@ -33,4 +33,4 @@ This Javascript will create a "Play" button in each scene card. You can click on
  - v0.2 Seperate the code with different mode: "browsers" and "player".
  - v0.1 Add file details to the on mouse hover event.
 #### Plans
-  - oculusvr mode: ~~ If you use Oculus Browser, the script can do automatic VR for you. ~~ Need https for further WebVR control.
+  - oculusvr mode: ~~If you use Oculus Browser, the script can do automatic VR for you.~~ Need https for further WebVR control.
