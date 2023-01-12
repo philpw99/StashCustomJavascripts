@@ -15,6 +15,7 @@
    This is a great way to view Stash and play scene files in Oculus Quest.
    Most importantly, once a video is played, you can make it full screen, then set the
    immersion mode to be "180" and "3d".
+   Version 0.4
 */
 
 // settings
