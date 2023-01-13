@@ -4,29 +4,33 @@
    To use it, just copy and paste the code into Stash->Settings->Interface->Custome Javascript.
    Then refresh the browser.
 
-   Player mode should be either "browser", "browserfull" or "player"
-   In browser mode, the video is played within a <video> tag. It works for most platforms.
-   In browserfull mode, the video is played in the browser, but in full screen.
-   Only works if user permits it.
-   In player mode, the video is trying to be sent to an external player.
-   Player mode is still buggy, but it should work in android.
-   A special use for player mode, is to use Oculus Browser to see the content of Stash,
-   then use "Play" to open the scene video quickly.
-   This is a great way to view Stash and play scene files in Oculus Quest.
-   Most importantly, once a video is played, you can make it full screen, then set the
-   immersion mode to be "180" and "3d".
-   Version 0.4
+   Player mode should be either "browser", "browserfull", "browserpip" or "player"
+   * browser: The video is played within a <video> tag. It works for most platforms.
+   * browserfull: The video is played in the browser, but in full screen.
+   * browserpip: The video is played in a small window in the front.
+   * player: The browser will try to send the steam link to an external player.
+   	 Player mode is still buggy, but it should work in android.
+   A special use for browserfull mode, is to use Oculus Browser to see the content of Stash,
+   then use "Play" to open the scene video in fullscreen quickly. It's a great way to view Stash and play scene files in Oculus Quest.
+   Version 0.5
 */
 
 // settings
 const debug = false;
 
-const pwPlayer_mode = "browserfull";
+const pwPlayer_mode = "browserpip";
 
 function log(str){
 	if(debug)console.log(str);
 }
 log("program starts.");
+
+// track mouse y position
+var pwPlayer_mouseY = 0;
+document.body.onmousemove = (e) => {
+	pwPlayer_mouseY = e.offsetY;
+}
+
 
 const pwPlayer_settings = {
 	// Path fixes for different OS. For local only.
@@ -110,6 +114,22 @@ pwPlayer_style.innerHTML = `
 		width: 100%;
 		height: 100%;
 	}
+	#pwPlayer_videoDivPIP{
+		background: black;
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		width: 800px;
+		height: 460px;
+		z-index: 1040;
+	}
+	#pwPlayer_videoDivPIPheader{
+		padding: 10px;
+	  	cursor: move;
+	  	z-index: 1040;
+		background-color: #202124;
+	  	color: #ffffff;
+	  }
 }
 `;
 
@@ -274,70 +294,76 @@ const pwPlayer_addButton = () => {
 					.replace(pwPlayer_settings[pwPlayer_OS].replacePath[0],
 						pwPlayer_settings[pwPlayer_OS].replacePath[1]);
 
-				if (pwPlayer_mode === "browser"){
-					// normal browser mode
-					playVideoInBrowser(streamLink);
-				}else if(pwPlayer_mode === "browserfull"){
-					// fullscreen browser mode
-					playVideoInBrowser(streamLink, true);
-				}else if(pwPlayer_mode === "player"){
-					switch (pwPlayer_OS){
-						case "Mac OS":
-							// Sample local handling for iina player.
-							// if you don't have iina player, use "remote" mode instead.
-							if(debug)alert("you just click play in MacOS");
-							if (pwPlayer_mode == "player"){
-								href = pwPlayer_settings.MacOS.urlScheme +
-									pwPlayer_settings.MacOS.replacePath[1] +
-									encodeURIComponent(filePath);
-								window.open(href);
-							}
-							break;
-						case "Android":
-							// Special andoid launch with intent
-							if (button.href == "javascript:;"){
-								url = new URL(streamLink);
-								const scheme=url.protocol.slice(0,-1);
-								url.hash = `Intent;action=android.intent.action.VIEW;scheme=${scheme};type=video/mp4;S.title=${encodeURI(
-									result.data.findScene.files[0].basename
-									)};end`;
-								url.protocol = "intent";
-								button.href = url.toString();
-								button.click();
-							}
-							break;
 
-						case "iOS":
-							// Special ios launch
-							if( button.href == "javascript:;"){
-								url = new URL();
-								url.host = "x-callback-url";
-								url.port = "";
-								url.pathname = "stream";
-								url.search = `url=${encodeURIComponent(streamLink)}`;
-								url.protocol = "vlc-x-callback";
-								button.href = url.toString();
-								button.click();
-							}
-							break;
-						case "Oculus":
-							// use browser built-in player
-							if (button.href == "javascript:;"){
-								button.href = streamLink;
-								button.click();
-							}
-							break;
-						case "Windows":
-							if(debug)alert("you just click play in Windows");
-							if (pwPlayer_mode == "player"){
-								settings = pwPlayer_settings.Windows;
-								href = settings.urlScheme + encodeURIComponent(filePath);
-								window.open(href);
-							}
-							break;
-						default:
-					} // end of the switch
-				} // end of player mode
+				switch(pwPlayer_mode){
+					case "browser":		// normal browser mode
+						playVideoInBrowser(streamLink);
+						break;
+					case "browserfull":	// fullscreen browser mode
+						playVideoInBrowser(streamLink, true);
+						break;
+					case "browserpip":	// picture in picture browser mode
+						playVideoPIP(streamLink);
+						break;
+					case "player":
+						switch (pwPlayer_OS){
+							case "Mac OS":
+								// Sample local handling for iina player.
+								// if you don't have iina player, use "remote" mode instead.
+								if(debug)alert("you just click play in MacOS");
+								if (pwPlayer_mode == "player"){
+									href = pwPlayer_settings.MacOS.urlScheme +
+										pwPlayer_settings.MacOS.replacePath[1] +
+										encodeURIComponent(filePath);
+									window.open(href);
+								}
+								break;
+							case "Android":
+								// Special andoid launch with intent
+								if (button.href == "javascript:;"){
+									url = new URL(streamLink);
+									const scheme=url.protocol.slice(0,-1);
+									url.hash = `Intent;action=android.intent.action.VIEW;scheme=${scheme};type=video/mp4;S.title=${encodeURI(
+										result.data.findScene.files[0].basename
+										)};end`;
+									url.protocol = "intent";
+									button.href = url.toString();
+									button.click();
+								}
+								break;
+
+							case "iOS":
+								// Special ios launch
+								if( button.href == "javascript:;"){
+									url = new URL();
+									url.host = "x-callback-url";
+									url.port = "";
+									url.pathname = "stream";
+									url.search = `url=${encodeURIComponent(streamLink)}`;
+									url.protocol = "vlc-x-callback";
+									button.href = url.toString();
+									button.click();
+								}
+								break;
+							case "Oculus":
+								// use browser built-in player
+								if (button.href == "javascript:;"){
+									button.href = streamLink;
+									button.click();
+								}
+								break;
+							case "Windows":
+								if(debug)alert("you just click play in Windows");
+								if (pwPlayer_mode == "player"){
+									settings = pwPlayer_settings.Windows;
+									href = settings.urlScheme + encodeURIComponent(filePath);
+									window.open(href);
+								}
+								break;
+							default:
+						} // end of the switch about os
+						break;  // fullscreen browser mode
+				} 	// end of switch of mode
 			});
 
 		};	// end of button onclick envent.
@@ -392,6 +418,14 @@ function niceBytes(x){
 }
 
 function playVideoInBrowser(streamLink, fullscreen = false){
+	// It adds a video in the front of the body, while PIP adds to the end.
+
+	// close previous video element, if any.
+	const previousElm = document.body.querySelector(".pwPlayer_videoDiv");
+	if (previousElm!==null){
+		document.body.removeChild(previousElm);
+	}
+
 	var pwPlayer_video_div = document.createElement("div");
 
 	pwPlayer_video_div.id = "pwPlayer_videoDiv";
@@ -433,15 +467,9 @@ function playVideoInBrowser(streamLink, fullscreen = false){
 
 	}
 
-	// track mouse y position
-	var pwPlayer_mouseY = 0;
-	document.onmousemove = (e) => {
-		pwPlayer_mouseY = e.clientY;
-	}
-
 	let pwPwPlayer_videoEnd = () =>{
 		// all video will call this to end.
-		pwPlayer_video.pause();
+		// pwPlayer_video.pause();  the video usually paused already.
 		document.body.removeChild(pwPlayer_divNode);
 		window.scrollTo(0, pwPlayer_scrollPos);
 	}
@@ -464,9 +492,11 @@ function playVideoInBrowser(streamLink, fullscreen = false){
 	pwPlayer_video.onpause = (event) => {
 		if(inFullScreen()){
 			// in fullscreen mode, mouse in the bottom 1/5, do nothing.
-			if ( (screen.height - pwPlayer_mouseY)<(screen.height/5) ){
+			if ( pwPlayer_mouseY+window.screenTop > window.outerHeight*0.8 ){
 				return;
 			}else{
+				log("bingo: mouseY:" + pwPlayer_mouseY + " winTop:" + window.screenTop + " win.OH:" + window.outerHeight);
+				return;
 				// exit full screen and prepare to be deleted.
 				exitFullscreen();
 				pwPwPlayer_videoEnd();
@@ -474,15 +504,139 @@ function playVideoInBrowser(streamLink, fullscreen = false){
 			}
 		}
 		// normal video process.
-		var rect = event.target.getBoundingClientRect();
-		var y = rect.top + rect.height - pwPlayer_mouseY;
-		log("client Y:" + pwPlayer_mouseY + " y:" + y + ' rect h:' + rect.height);
-		if ( Math.abs(y) < rect.height / 5 ) return;
+		if ( pwPlayer_mouseY > screen.innerHeight*0.8 ) return;
 
 		log("play ends, scroll pos:" + pwPlayer_scrollPos);
 		pwPwPlayer_videoEnd();
 	}
+
 }
+
+var pwPlayer_DivX=0, pwPlayer_DivY=0;
+
+function playVideoPIP(streamLink){
+	// It will show a video in a dragable window
+	const previousElm = document.body.querySelector(".pwPlayer_videoDivPIP");
+	if (previousElm!==null){
+		document.body.removeChild(previousElm);
+	}
+	var pwPlayer_video_div = document.createElement("div");
+	pwPlayer_video_div.id = "pwPlayer_videoDivPIP";
+	var pwPlayer_PiPHeader = document.createElement("div");
+	pwPlayer_PiPHeader.id = "pwPlayer_videoDivPIPheader";
+	pwPlayer_video_div.appendChild(pwPlayer_PiPHeader);
+	var pwPlayer_video = document.createElement("video");
+	pwPlayer_video.id = "pwPlayer_video";
+	pwPlayer_video.autoplay = true;
+	pwPlayer_video.controls = true;
+	pwPlayer_video.src = streamLink;
+	pwPlayer_video_div.appendChild(pwPlayer_video);
+	var pwPlayer_divNode = document.body.appendChild(pwPlayer_video_div);
+	x = (pwPlayer_DivX + pwPlayer_video_div.offsetWidth > window.innerWidth) ?
+		window.innerWidth - pwPlayer_video_div.offsetWidth : pwPlayer_DivX ;
+	x = (x < 0)? 0 : x;
+	y = (pwPlayer_DivY + pwPlayer_video_div.offsetHeight> window.innerHeight)?
+		window.innerHeight - pwPlayer_video_div.offsetHeight : pwPlayer_DivY ;
+	y = (y < 0)? 0 : y;
+
+
+	pwPlayer_video_div.style.top = (window.scrollY + y)+"px";
+	pwPlayer_video_div.style.left = (window.scrollX + x)+"px";
+
+	// pwPlayer_video_div.width =300;
+	// pwPlayer_video_div.height =200;
+
+	pwPlayer_video.onpause = () =>{
+		pipWidth = pwPlayer_video_div.offsetWidth;
+		pipHeight = pwPlayer_video_div.offsetHeight;
+
+		pwPlayer_DivY = parseInt(pwPlayer_video_div.style.top)-window.scrollY;
+		pwPlayer_DivX = parseInt(pwPlayer_video_div.style.left)-window.scrollX;
+
+		// log("mouseY:"+_mouseY);
+		if(inFullScreen()){
+			// in fullscreen mode, mouse in the bottom 1/5, do nothing.
+			if ( pwPlayer_mouseY+window.screenTop > window.outerHeight*0.8 ){
+				return;
+			}else{
+				log("bingo: mouseY:" + pwPlayer_mouseY + " winTop:" + window.screenTop + " win.OH:" + window.outerHeight);
+				// exit full screen and prepare to be deleted.
+				exitFullscreen();
+				document.body.removeChild(pwPlayer_divNode);
+				return;
+			}
+		}
+
+		// mouse is inside the pip box, but in the lower control area
+		if (pwPlayer_mouseY > pipHeight*0.8 ) return;
+		// Save the previous location
+		log( "mouseY:"+ pwPlayer_mouseY + " DivY:" + pwPlayer_DivY + " divX:" + pwPlayer_DivX);
+		// delete it.
+		document.body.removeChild(pwPlayer_divNode);
+	};
+
+	pwPlayer_video.onended = () =>{
+		if(inFullScreen()){
+			// in fullscreen mode, mouse in the bottom 1/5, do nothing.
+			if ( pwPlayer_mouseY+window.screenTop > window.outerHeight*0.8 ){
+				return;
+			}else{
+				log("bingo: mouseY:" + pwPlayer_mouseY + " winTop:" + window.screenTop + " win.OH:" + window.outerHeight);
+				// exit full screen and prepare to be deleted.
+				exitFullscreen();
+				document.body.removeChild(pwPlayer_divNode);
+				return;
+			}
+		}
+		document.body.removeChild(pwPlayer_divNode);
+	};
+
+	dragPiPElement(pwPlayer_video_div);
+
+}
+
+
+function dragPiPElement(elmnt) {
+	var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+	if (document.getElementById(elmnt.id + "header")) {
+	  // if present, the header is where you move the DIV from:
+	  document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+	} else {
+	  // otherwise, move the DIV from anywhere inside the DIV:
+	  elmnt.onmousedown = dragMouseDown;
+	}
+
+	function dragMouseDown(e) {
+		e = e || window.event;
+		e.preventDefault();
+		// get the mouse cursor position at startup:
+		pos3 = e.clientX;
+		pos4 = e.clientY;
+		document.onmouseup = closeDragElement;
+		// call a function whenever the cursor moves:
+		document.onmousemove = elementDrag;
+	}
+
+	function elementDrag(e) {
+		e = e || window.event;
+		e.preventDefault();
+		// calculate the new cursor position:
+		pos1 = pos3 - e.clientX;
+		pos2 = pos4 - e.clientY;
+		pos3 = e.clientX;
+		pos4 = e.clientY;
+		// set the element's new position:
+		elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+		elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+	}
+
+	function closeDragElement() {
+		// stop moving when mouse button is released:
+		document.onmouseup = null;
+		document.onmousemove = null;
+	}
+}
+
 
 function doFullScreen() {
     var element = document.documentElement;
