@@ -18,7 +18,7 @@
 // settings
 const debug = false;
 
-const pwPlayer_mode = "browserpip";
+const pwPlayer_mode = "browserfull";
 
 function log(str){
 	if(debug)console.log(str);
@@ -310,7 +310,7 @@ const pwPlayer_addButton = () => {
 							case "Mac OS":
 								// Sample local handling for iina player.
 								// if you don't have iina player, use "remote" mode instead.
-								if(debug)alert("you just click play in MacOS");
+								if(debug)alert("playermode. you just click play in MacOS");
 								if (pwPlayer_mode == "player"){
 									href = pwPlayer_settings.MacOS.urlScheme +
 										pwPlayer_settings.MacOS.replacePath[1] +
@@ -320,6 +320,7 @@ const pwPlayer_addButton = () => {
 								break;
 							case "Android":
 								// Special andoid launch with intent
+								if(debug)alert("playermode. you just click play in Android");
 								if (button.href == "javascript:;"){
 									url = new URL(streamLink);
 									const scheme=url.protocol.slice(0,-1);
@@ -353,7 +354,7 @@ const pwPlayer_addButton = () => {
 								}
 								break;
 							case "Windows":
-								if(debug)alert("you just click play in Windows");
+								if(debug)alert("playermode. you just click play in Windows");
 								if (pwPlayer_mode == "player"){
 									settings = pwPlayer_settings.Windows;
 									href = settings.urlScheme + encodeURIComponent(filePath);
@@ -465,29 +466,29 @@ function playVideoInBrowser(streamLink, fullscreen = false){
 		pwPlayer_video.height = screen.height;
 		pwPlayer_video.width = screen.width;
 
-	}
+	};
 
 	let pwPwPlayer_videoEnd = () =>{
 		// all video will call this to end.
 		// pwPlayer_video.pause();  the video usually paused already.
+		if(inFullScreen()){
+			exitFullscreen();
+		}
 		document.body.removeChild(pwPlayer_divNode);
 		window.scrollTo(0, pwPlayer_scrollPos);
-	}
+	};
 
 	pwPlayer_video.onerror = () => {
 		alert("Error playing this video.");
 		log("Error in playing, scroll pos:" + pwPlayer_scrollPos);
 		pwPwPlayer_videoEnd();
-	}
+	};
 
 	pwPlayer_video.onended = () => {
-		if(inFullScreen()){
-			exitFullscreen();
-		}
 		// normal ending
 		log("video reach the end.");
 		pwPwPlayer_videoEnd();
-	}
+	};
 
 	pwPlayer_video.onpause = (event) => {
 		if(inFullScreen()){
@@ -496,9 +497,7 @@ function playVideoInBrowser(streamLink, fullscreen = false){
 				return;
 			}else{
 				log("bingo: mouseY:" + pwPlayer_mouseY + " winTop:" + window.screenTop + " win.OH:" + window.outerHeight);
-				return;
 				// exit full screen and prepare to be deleted.
-				exitFullscreen();
 				pwPwPlayer_videoEnd();
 				return;
 			}
@@ -508,7 +507,7 @@ function playVideoInBrowser(streamLink, fullscreen = false){
 
 		log("play ends, scroll pos:" + pwPlayer_scrollPos);
 		pwPwPlayer_videoEnd();
-	}
+	};
 
 }
 
