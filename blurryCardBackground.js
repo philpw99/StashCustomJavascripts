@@ -16,7 +16,11 @@ log("program starts.");
 // style
 const blurry_style = document.createElement("style");
 blurry_style.innerHTML = `
-.thumbnail-section::after {
+div.scene-card .thumbnail-section::after,
+div.image-card .thumbnail-section::after,
+div.movie-card .thumbnail-section::after,
+div.gallery-card .thumbnail-section::after,
+div.performer-card .thumbnail-section::after {
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
 
@@ -30,27 +34,6 @@ blurry_style.innerHTML = `
 .thumbnail-section {
     position: relative;
     background-position: center;
-}
-
-.scene-card-preview-image {
-    position: relative;
-    z-index: 1;
-}
-.movie-card-image {
-    position: relative;
-    z-index: 1;
-}
-.gallery-card-image {
-    position: relative;
-    z-index: 1;
-}
-.image-card-preview-image {
-    position: relative;
-    z-index: 1;
-}
-.performer-card-image {
-    position: relative;
-    z-index: 1;
 }
 `;
 
@@ -101,6 +84,8 @@ function addImageSource() {
 	log( "cat:" + cat );
 	if (cat == "others") return;
 
+	// Add style here
+
 	log("adding images.")
 	// Galleries?
     var cards = document.querySelectorAll("div[class^='" + cat +"-card ']");
@@ -124,6 +109,7 @@ function addImageSource() {
 			case "gallery":
 			case "movie":
 			case "performer":
+			case "studio":
 				preview_image = card.querySelector("img." + cat + "-card-image");
 				break;
 			default:
@@ -133,22 +119,34 @@ function addImageSource() {
 			log( "preview image is null. " );
 			return;
 		}
-        thumbnail_section.style.backgroundImage = "url(" + preview_image.src + ")"
+		// patch code 1
+		if (cat == "scene"){
+			preview_video = card.querySelector("video.scene-card-preview-video");
+			if (preview_video !== null){
+				preview_video.style.zIndex = "2";
+			}
+		}
+
+		preview_image.style.position = "relative";
+		preview_image.style.zIndex = "1";
+		if (cat !== "studio"){
+        	thumbnail_section.style.backgroundImage = "url(" + preview_image.src + ")";
+		}
     });
 }
-log("build013");
+
 function getCat(){
 	url = new URL(window.location.href);
 	path = String(url.pathname);
 	log("path:" + path);
 	const catArray = path.match( /\/[a-z]+/ )
-	if (catArray == null || catArray[0] == "/tags") return "others";
+	if (catArray == null || catArray[0] == "/tags" ) return "others";
 	if(catArray[0] == "/galleries") {
 		return "gallery";
 	}else{
 		// get rid of the '/' in the beginning and "s" in the end
 		cat = catArray[0].slice(1,-1);
-		if (["scene", "movie", "image", "performer" ].indexOf(cat) !== -1)
+		if (["scene", "movie", "image", "performer", "studio" ].indexOf(cat) !== -1)
 			return cat;
 		return "others";
 	}
