@@ -5,9 +5,9 @@
  
 File to use:
 * pwPlayer.js : This is the latest development.
-* pwPlayer - PiP v0.5.js : This This is pre-configured js file for playing videos in Picture-in-Picture mode.
+* pwPlayer - PiP v0.5.js : This This is pre-configured js file for playing videos in Picture-in-Picture mode. Default size is 800x450, you can change it in the script.
 * pwPlayer - Fullscreen v0.5.js : This This is pre-configured js file for playing videos in Fullscreen mode.
-* pwPlayer - Browser v0.5.js : This This is pre-configured js file for playing videos in Browser mode.
+* pwPlayer - Browser v0.5.js : This This is pre-configured js file for playing videos in Browser mode, which the video will fill up the available browser space, but it will not make the browser fullscreen.
 * pwPlayer - Oculus v0.5.js : This is pre-configured js file for Oculus Browser. Every video will be played in full screen mode. Works great for VR videos! In fullscreen you need to choose the VR mode like 180 and 3D side by side. The browser will not remember it. When the playing is done, click on the pause button and you will be back to the scene wall immediately.
 * blurryCardBackground.js: Fill scene/movie/image/gallery/studio cards with blurry background. Inspired by CJ in Discord channel.
 
