@@ -6,6 +6,7 @@
 File to use:
 * pwPlayer.js : This is the latest development.
 * pwPlayer - Oculus v0.5.js : This is pre-configured js file for Oculus Browser. Every video will be played in full screen mode. Works great for VR videos! In fullscreen you need to choose the VR mode like 180 and 3D side by side. The browser will not remember it. When the playing is done, click on the pause button and you will be back to the scene wall immediately.
+* blurryCardBackground.js: Fill scene/movie/image/gallery/studio cards with blurry background. Inspired by CJ in Discord channel.
 
 ### Reason to create a repo just for this:
  
@@ -39,5 +40,11 @@ This Javascript will create a "Play" button in each scene card. You can click on
  - v0.3 Add "browserfull" mode and test fullscreen feature in all 3 browsers.
  - v0.2 Seperate the code with different mode: "browsers" and "player".
  - v0.1 Add file details to the on mouse hover event.
-#### Plans
-  - oculusvr mode: ~~If you use Oculus Browser, the script can do automatic VR for you.~~ Need https for further WebVR control.
+
+### blurryCardBackground - Add blurry background to scene/movie/gallery/image/studio.
+It fills up the background with blurry images like this:
+<img src="https://i.ytimg.com/vi/yCOrqUA0ws4/maxresdefault.jpg" width=300 />
+CJ made the original CSS and javascript. I completed the script and make it works in most pages.
+This script is better to be used alone, don't mix it up.
+
+
