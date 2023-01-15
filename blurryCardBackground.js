@@ -16,11 +16,7 @@ log("program starts.");
 // style
 const blurry_style = document.createElement("style");
 blurry_style.innerHTML = `
-div.scene-card .thumbnail-section::after,
-div.image-card .thumbnail-section::after,
-div.movie-card .thumbnail-section::after,
-div.gallery-card .thumbnail-section::after,
-div.performer-card .thumbnail-section::after {
+.thumbnail-section::after {
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
 
@@ -37,7 +33,7 @@ div.performer-card .thumbnail-section::after {
 }
 `;
 
-document.head.appendChild(blurry_style);
+blurry_node = document.head.appendChild(blurry_style);
 
 // wait for last elm of page
 const blurry_config = { subtree: true, childList: true };
@@ -82,10 +78,12 @@ function addImageSource() {
 	cat = getCat();
 
 	log( "cat:" + cat );
-	if (cat == "others") return;
+	if (cat == "others"){
+		document.head.removeChild(blurry_node);
+		return;
+	} 
 
 	// Add style here
-
 	log("adding images.")
 	// Galleries?
     var cards = document.querySelectorAll("div[class^='" + cat +"-card ']");
@@ -109,7 +107,6 @@ function addImageSource() {
 			case "gallery":
 			case "movie":
 			case "performer":
-			case "studio":
 				preview_image = card.querySelector("img." + cat + "-card-image");
 				break;
 			default:
@@ -129,24 +126,24 @@ function addImageSource() {
 
 		preview_image.style.position = "relative";
 		preview_image.style.zIndex = "1";
-		if (cat !== "studio"){
-        	thumbnail_section.style.backgroundImage = "url(" + preview_image.src + ")";
-		}
+
+		thumbnail_section.style.backgroundImage = "url(" + preview_image.src + ")";
+
     });
-}
+};
 
 function getCat(){
 	url = new URL(window.location.href);
 	path = String(url.pathname);
 	log("path:" + path);
 	const catArray = path.match( /\/[a-z]+/ )
-	if (catArray == null || catArray[0] == "/tags" ) return "others";
+	if (catArray == null ) return "others";
 	if(catArray[0] == "/galleries") {
 		return "gallery";
 	}else{
 		// get rid of the '/' in the beginning and "s" in the end
 		cat = catArray[0].slice(1,-1);
-		if (["scene", "movie", "image", "performer", "studio" ].indexOf(cat) !== -1)
+		if (["scene", "movie", "image", "performer" ].indexOf(cat) !== -1)
 			return cat;
 		return "others";
 	}
