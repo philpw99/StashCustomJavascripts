@@ -42,8 +42,8 @@ This Javascript will create a "Play" button in each scene card. You can click on
  - v0.1 Add file details to the on mouse hover event.
 
 ### blurryCardBackground - Add blurry background to scene/movie/gallery/image/studio.
-It fills up the background with blurry images like this:
-<img src="https://i.ytimg.com/vi/yCOrqUA0ws4/maxresdefault.jpg" width=300 />
+It fills up the background with blurry images like this:<p>
+<img src="https://i.ytimg.com/vi/yCOrqUA0ws4/maxresdefault.jpg" width=300 /><p>
 CJ made the original CSS and javascript. I completed the script and make it works in most pages.
 This script is better to be used alone, don't mix it up.
 
