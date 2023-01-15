@@ -7,7 +7,7 @@
 */
 
 // settings
-const debug = false;
+const debug = true;
 
 function log(str){
 	if(debug)console.log(str);
@@ -33,8 +33,6 @@ blurry_style.innerHTML = `
 }
 `;
 
-blurry_node = document.head.appendChild(blurry_style);
-
 // wait for last elm of page
 const blurry_config = { subtree: true, childList: true };
 const blurry_WaitElm = "span[class^='filter-container']";	
@@ -56,22 +54,47 @@ const blurry_waitForElm = (selector) => {
 };
 
 // initial
-blurry_waitForElm(blurry_WaitElm).then(() => {
-    addImageSource();
-});
-
+var blurry_node = null;
+if(addStyle()){
+	blurry_waitForElm(blurry_WaitElm).then(() => {
+		addImageSource();
+	});
+}
 // route
 let previousUrl = window.location.href;
 const observer = new MutationObserver(function (mutations) {
 	if (window.location.href !== previousUrl) {
 		previousUrl = window.location.href;
-		blurry_waitForElm(blurry_WaitElm).then(() => {
-			addImageSource();
-		});
+		if (blurry_node != null){
+			document.head.removeChild(blurry_node);
+			blurry_node = null;
+		}
+		
+		if(addStyle()){
+			blurry_waitForElm(blurry_WaitElm).then(() => {
+				addImageSource();
+			});
+		}
 	}
 });
 
 observer.observe(document, blurry_config);
+
+function addStyle(){
+	category = getCat()
+	switch (category){
+		case "scene":
+		case "movie":
+		case "image":
+		case "gallery":
+		case "performers":
+			blurry_node = document.head.appendChild(blurry_style);
+			return true;
+		default:
+			return false;
+	}
+}
+
 
 // Main function.
 function addImageSource() {
@@ -79,6 +102,7 @@ function addImageSource() {
 
 	log( "cat:" + cat );
 	if (cat == "others"){
+		// just in case
 		document.head.removeChild(blurry_node);
 		return;
 	} 
