@@ -16,15 +16,15 @@
 */
 
 // settings
-const debug = false;
+const debug = true;
 
-const pwPlayer_mode = "browserfull";
+const pwPlayer_mode = "browserpip";
 
 function log(str){
 	if(debug)console.log(str);
 }
 log("program starts.");
-
+log("build001");
 // track mouse y position
 var pwPlayer_mouseY = 0;
 document.body.onmousemove = (e) => {
@@ -233,7 +233,7 @@ function pwPlayer_getBrowser(){
 }
 
 const pwPlayer_config = { subtree: true, childList: true };
-const pwPlayer_previewElm = "video.scene-card-preview-video";
+const pwPlayer_WaitElm = "div.toast-container.row";
 // promise
 const pwPlayer_waitForElm = selector => {
     return new Promise(resolve => {
@@ -251,7 +251,7 @@ const pwPlayer_waitForElm = selector => {
 };
 
 // initial
-pwPlayer_waitForElm(pwPlayer_previewElm).then(() => {
+pwPlayer_waitForElm(pwPlayer_WaitElm).then(() => {
     pwPlayer_addButton();
 });
 
