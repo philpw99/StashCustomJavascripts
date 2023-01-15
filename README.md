@@ -1,6 +1,12 @@
 # Stash Custom Javascripts - Unexpectably Powerful !
 <p>
  
+#### This repo contains custom javascripts to be used in the amazing [StashApp](https://github.com/stashapp/stash), which empower you to manage all your special video collections. Credits to all the incredible, talented and hardworking programmers who make the StashApp so elegant and useful !
+ 
+File to use:
+* pwPlayer.js : This is the latest development.
+* pwPlayer - Oculus v0.5.js : This is pre-configured js file for Oculus Browser. Every video will be played in full screen mode. Works great for VR videos! In fullscreen you need to choose the VR mode like 180 and 3D side by side. The browser will not remember it. When the playing is done, click on the pause button and you will be back to the scene wall immediately.
+
 ### Reason to create a repo just for this:
  
 StashApp is an excellent video management system for all your desires. It has many great features, but playing videos is a little short.<p>
