@@ -12,7 +12,7 @@
    	 Player mode is still buggy, but it should work in android.
    A special use for browserfull mode, is to use Oculus Browser to see the content of Stash,
    then use "Play" to open the scene video in fullscreen quickly. It's a great way to view Stash and play scene files in Oculus Quest.
-   Version 0.5
+   Version 0.6
 */
 
 // settings
@@ -30,7 +30,6 @@ var pwPlayer_mouseY = 0;
 document.body.onmousemove = (e) => {
 	pwPlayer_mouseY = e.offsetY;
 }
-
 
 const pwPlayer_settings = {
 	// Path fixes for different OS. For local only.
@@ -137,7 +136,7 @@ pwPlayer_style.innerHTML = `
 const pwPlayer_OS = pwPlayer_getOS();
 log("OS: " + pwPlayer_OS);
 
-document.head.appendChild(pwPlayer_style);
+var pwPlayer_styleNode = document.head.appendChild(pwPlayer_style);
 
 // api
 const pwPlayer_getSceneDetails = async href => {
@@ -233,7 +232,7 @@ function pwPlayer_getBrowser(){
 }
 
 const pwPlayer_config = { subtree: true, childList: true };
-const pwPlayer_WaitElm = "div.toast-container.row";
+const pwPlayer_WaitElm = "video.scene-card-preview-video";
 // promise
 const pwPlayer_waitForElm = selector => {
     return new Promise(resolve => {
@@ -250,32 +249,42 @@ const pwPlayer_waitForElm = selector => {
     });
 };
 
-// initial
+// initial start point
+/*
 pwPlayer_waitForElm(pwPlayer_WaitElm).then(() => {
     pwPlayer_addButton();
 });
-
+*/
 // route
 let previousUrl = "";
 const observer = new MutationObserver(function (mutations) {
     if (window.location.href !== previousUrl) {
         previousUrl = window.location.href;
-        pwPlayer_waitForElm(pwPlayer_previewElm).then(() => {
+        pwPlayer_waitForElm(pwPlayer_WaitElm).then(() => {
             pwPlayer_addButton();
         });
     }
 });
 
-observer.observe(document, pwPlayer_config);
+observer.observe(document.body, pwPlayer_config);
 
 // main
 const pwPlayer_addButton = () => {
-    const scenes = document.querySelectorAll("div.row > div");
+	const cat = pwPlayer_getCat();
+	if (cat =="root"){
+		css = "div.slick-track > div";
+	}else{
+		css = "div.scene-card ";
+	}
+	
+	const scenes = document.querySelectorAll(css);
+    
     for (const scene of scenes) {
         if (scene.querySelector("a.pwPlayer_button") != null) continue;
 
-		const scene_url = scene.querySelector("a.scene-card-link"),
-		popover = scene.querySelector("div.card-popovers"),
+		const scene_url = scene.querySelector("a.scene-card-link");
+		if (scene_url===null) continue;
+		const popover = scene.querySelector("div.card-popovers"),
 		button = document.createElement("a");
 		button.innerHTML = `
 		<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
@@ -394,6 +403,26 @@ ${data.date?"Date: "+data.date : ""}`;
         
     }; // end of the each scene card loop.
 };	// end of pwPlayer_addButton function.
+
+// helper functions
+
+function pwPlayer_getCat(){
+	url = new URL(window.location.href);
+	path = String(url.pathname);
+	log("path:" + path);
+	if(path == "/" || path == "") return "root";
+	const catArray = path.match( /\/[a-z]+/ )
+	if (catArray == null ) return "others";
+	if(catArray[0] == "/galleries") {
+		return "gallery";
+	}else{
+		// get rid of the '/' in the beginning and "s" in the end
+		cat = catArray[0].slice(1,-1);
+		if (["scene", "movie", "image", "performer" ].indexOf(cat) !== -1)
+			return cat;
+		return "others";
+	}
+}
 
 function WrapStr(s,n){
 	// 
@@ -544,6 +573,10 @@ function playVideoPIP(streamLink){
 
 	// pwPlayer_video_div.width =300;
 	// pwPlayer_video_div.height =200;
+	pwPlayer_video.onerror = () =>{
+		document.body.removeChild(pwPlayer_divNode);
+		alert("Error Playing this video.");
+	}
 
 	pwPlayer_video.onpause = () =>{
 		pipWidth = pwPlayer_video_div.offsetWidth;
