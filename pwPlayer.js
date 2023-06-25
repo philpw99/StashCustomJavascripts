@@ -18,7 +18,7 @@
 // settings
 const debug = true;
 
-const pwPlayer_mode = "browserpip";
+const pwPlayer_mode = "browser";
 
 function log(str){
 	if(debug)console.log(str);
@@ -284,7 +284,6 @@ const pwPlayer_addButton = () => {
 
 		const scene_url = scene.querySelector("a.scene-card-link");
 		if (scene_url===null) continue;
-		const popover = scene.querySelector("div.card-popovers"),
 		button = document.createElement("a");
 		button.innerHTML = `
 		<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
@@ -294,6 +293,21 @@ const pwPlayer_addButton = () => {
 
 		button.classList.add("pwPlayer_button");
 		button.href = "javascript:;";
+
+		// check if the card-popover div exists before creating the variable, if it doesn't quickly create it
+		//  This ensures all scenes will have a play button, not just the ones with configured performers.
+        if (!scene.querySelector("div.card-popovers")) {
+            // add popover element
+            popoverElm = document.createElement("div");
+            popoverElm.classList.add("card-popovers");
+            button.href = "javascript:;";
+
+            hrElm = document.createElement("hr");
+
+            scene.append(hrElm);
+            scene.append(popoverElm);
+        }
+		const popover = scene.querySelector("div.card-popovers");
 		
 		button.onclick = () =>{
 			pwPlayer_getSceneInfo(scene_url.href)
@@ -532,7 +546,7 @@ function playVideoInBrowser(streamLink, fullscreen = false){
 			}
 		}
 		// normal video process.
-		if ( pwPlayer_mouseY > screen.innerHeight*0.8 ) return;
+		if ( pwPlayer_mouseY > window.innerHeight*0.8 ) return;
 
 		log("play ends, scroll pos:" + pwPlayer_scrollPos);
 		pwPwPlayer_videoEnd();
