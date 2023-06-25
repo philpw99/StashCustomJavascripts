@@ -307,7 +307,7 @@ const pwPlayer_addButton = () => {
             scene.append(hrElm);
             scene.append(popoverElm);
         }
-		const popover = scene.querySelector("div.card-popovers");
+        const popover = scene.querySelector("div.card-popovers");
 		
 		button.onclick = () =>{
 			pwPlayer_getSceneInfo(scene_url.href)
